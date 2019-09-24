@@ -2,7 +2,7 @@
 
 Ideia Inicial: Criar um servidor de jogo, estilo “Pong” (porém somente a bolinha), em tempo real, onde vários clientes poderão acessar e ver as bolinhas se chocando.
 
-Funcionamento: Cada cliente irá se conectar ao servidor, gerando assim uma bolinha para ele no jogo, com uma cor específica, e tal cliente irá acompanhar em tempo real o movimento da bolinha dele e de outros clientes, definido pelo servidor. O usuário poderá somente visualizar o jogo, não poderá modificá-los.
+Funcionamento: Cada cliente irá se conectar ao servidor, gerando assim uma bolinha para ele no jogo, com uma cor específica, e tal cliente irá acompanhar em tempo real o movimento da bolinha dele e de outros clientes, definido pelo servidor. O usuário poderá somente visualizar o jogo, não poderá modificá-lo.
     
 Testes:
 
