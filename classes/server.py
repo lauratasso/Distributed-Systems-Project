@@ -1,10 +1,10 @@
 import socket
 
-NRO_CLIENTS = 4
+NRO_CLIENTS = 2
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket object
 host = "0.0.0.0"  # socket.gethostname()                     # Get local machine name
-port = 4324  # Reserve a port for your service.
+port = 4322  # Reserve a port for your service.
 # Bind to the port
 socket.bind((host, port))  # Escutando na pota 4323
 socket.listen(NRO_CLIENTS)  # Conexão com no máximo 4 clients
@@ -53,13 +53,16 @@ for _ in range(NRO_CLIENTS):
 for _, cl_socket in state.clients.values():
 
     curr_name, curr_conn = state.next_client
-    cl_socket.send(
-        str.encode(
-            f"O jogo começou. \
-            {'Eh a sua vez' if curr_conn == cl_socket else 'E a vez de ' + str(curr_name) }"
-        )
+    cl_socket.send( "OK!!!!!"
+       # str.encode(
+    #        f"O jogo começou. \
+     #       {'Eh a sua vez' if curr_conn == cl_socket else 'E a vez de ' + str(curr_name) }"
+      #  )
     )
+ball = Ball((255,0,0),423,212)
 
-while True:
-    for _, cl_socket in state.clients.values():
-        cl_socket.send(b"Ola tudo bem?")
+#while True:
+ #   for _, cl_socket in state.clients.values():
+
+  #      cl_socket.send(b"Ola tudo bem?")
+
