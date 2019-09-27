@@ -29,10 +29,10 @@ port = 4322  # Reserve a port for your service.
 s.connect((host, port))
 s.send(str.encode(input("Digite seu nome: ")))
 data = s.recv(1024) 
-#tela = Tela()
+tela = Tela()
 
-#tela.ball_list.append(random_ball())
-#tela.run()
+tela.ball_list.append(random_ball())
+tela.run()
 
 while True:
     data = s.recv(1024)
