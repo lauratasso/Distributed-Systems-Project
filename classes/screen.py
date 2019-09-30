@@ -1,14 +1,11 @@
 import pygame
 from pygame.locals import *
 from sys import exit
-import random
-
-# import class from classes folder
-from ball import Ball
 
 
-class Tela:
+class Screen:
 
+    # Construtor da classe
     def __init__(self):
         pygame.init()
 
@@ -25,6 +22,7 @@ class Tela:
         self.clock = pygame.time.Clock()
         font = pygame.font.SysFont("calibri", 40)
 
+    # Inicializa a tela, configura cores e linha central
     def run(self):
         while True:
 
@@ -44,5 +42,6 @@ class Tela:
 
             pygame.display.update()
 
+    # Atualza tela
     def update(self):
         pygame.display.update()

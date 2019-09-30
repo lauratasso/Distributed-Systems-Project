@@ -1,0 +1,71 @@
+import socket
+import random
+import time
+import json
+
+from classes.server import ServerState
+from utils.color import colors
+
+NRO_CLIENTS = 2
+INTERVAL = 0.08
+
+# Cria socket
+socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = "0.0.0.0"  # socket.gethostname()                     # Get local machine name
+port = 4322  # Reserve a port for your service.
+
+socket.bind((host, port))  # Escutando na pota 4323
+socket.listen(NRO_CLIENTS)  # Conexão com no máximo N clients
+print(f"Esperando conexões. É necessário {NRO_CLIENTS} para começar o jogo.")
+
+
+def random_ball(color):
+    # cria posição randomica para bola
+    coord_x = random.uniform(10, 630)
+    coord_y = random.uniform(10, 470)
+
+    speed_x = 250.
+    speed_y = 250.
+
+    # retorna lista com parametros necessários para manipulação da bola
+    return [color, coord_x, coord_y, speed_x, speed_y]
+
+
+state = ServerState()
+
+# Esperando N clientes se conectarem
+for i in range(NRO_CLIENTS):
+
+    conn, addr = socket.accept()  # Aceita conexao, retorna tupla socket, endereco
+    data = conn.recv(1024)
+    # Adiciona o cliente no estado do servidor
+    state.add_client(addr, data, conn)
+
+    color = colors[i]   # Pega cor [i] para a bola do cliente.
+    print(f"\n{data.decode()} entrou no jogo. Sua cor é: {color[0]}")
+    print(
+        f"Faltam {NRO_CLIENTS - i -1} jogadores para iniciar o jogo. Aguarde.")
+
+    state.next_client = (
+        data, conn) if state.next_client is None else state.next_client
+
+    ball = random_ball(color[1])
+    state.client_balls.append(ball)
+
+# Avisando aos clientes que o jogo começou
+for i, (_, cl_socket) in enumerate(state.clients.values()):
+
+    curr_name, curr_conn = state.next_client
+    cl_socket.send(
+        str.encode(
+            f"{state.get_balls_pos(False)}"
+        )
+    )
+
+# Atualizando posição das bolas e mandando para os clientes
+time.sleep(2)
+while True:
+    time.sleep(INTERVAL)
+    result = state.get_balls_pos(True)
+    for _, cl_socket in state.clients.values():
+        cl_socket.send(result.encode())
