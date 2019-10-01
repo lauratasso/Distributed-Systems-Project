@@ -4,7 +4,9 @@ import time
 import json
 
 from classes.server import ServerState
+from classes.message import Message
 from utils.color import colors
+from utils.message_type import MessageTypes
 
 NRO_CLIENTS = 2
 INTERVAL = 0.08
@@ -38,13 +40,23 @@ for i in range(NRO_CLIENTS):
 
     conn, addr = socket.accept()  # Aceita conexao, retorna tupla socket, endereco
     data = conn.recv(1024)
+
     # Adiciona o cliente no estado do servidor
     state.add_client(addr, data, conn)
-
     color = colors[i]   # Pega cor [i] para a bola do cliente.
-    print(f"\n{data.decode()} entrou no jogo. Sua cor é: {color[0]}")
-    print(
-        f"Faltam {NRO_CLIENTS - i -1} jogadores para iniciar o jogo. Aguarde.")
+
+    # Informa jogador sua cor e se faltam clientes para o inicio do jogo
+    data = f"\n{data.decode()} entrou no jogo. Sua cor é: {color[0]}"
+
+    if (NRO_CLIENTS - 1 - i > 0):
+        data += f"\nFaltam {NRO_CLIENTS - i -1} jogadores para iniciar o jogo. Aguarde."
+    else:
+        data += "\nO jogo começará em breve."
+
+    # Envia dados de cor e inicio do jogo para o cliente
+    msg = Message(MessageTypes.INFORMATION.value, data).toJSON()
+    (_, cl_socket) = state.clients[addr]
+    cl_socket.send(str.encode(msg))
 
     state.next_client = (
         data, conn) if state.next_client is None else state.next_client
@@ -54,11 +66,13 @@ for i in range(NRO_CLIENTS):
 
 # Avisando aos clientes que o jogo começou
 for i, (_, cl_socket) in enumerate(state.clients.values()):
-
     curr_name, curr_conn = state.next_client
+    msg = Message(MessageTypes.START.value,
+                  state.get_balls_pos(False)).toJSON()
+
     cl_socket.send(
         str.encode(
-            f"{state.get_balls_pos(False)}"
+            msg
         )
     )
 
@@ -66,6 +80,21 @@ for i, (_, cl_socket) in enumerate(state.clients.values()):
 time.sleep(2)
 while True:
     time.sleep(INTERVAL)
-    result = state.get_balls_pos(True)
+
+    # verifica se há ganhador
+    winner = state.check_winner()
+
+    if (winner):
+        data = f"\n{winner.upper().decode()} GANHOU O JOGO!!"
+        msg = Message(MessageTypes.WINNER.value, data).toJSON()
+
+    else:
+        result = state.get_balls_pos(True)
+        msg = Message(MessageTypes.UPDATE_BALLS.value, result).toJSON()
+
     for _, cl_socket in state.clients.values():
-        cl_socket.send(result.encode())
+        cl_socket.send(
+            str.encode(
+                msg
+            )
+        )

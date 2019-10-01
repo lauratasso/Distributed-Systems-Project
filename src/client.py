@@ -5,6 +5,28 @@ import json
 from classes.screen import Screen
 from classes.ball import Ball
 
+from utils.message_type import MessageTypes
+
+# Inicializa tela e thread do servidor, além de adcionar bolas na tela
+
+
+def startGame(data):
+    global screen
+    global thread_conn
+
+    screen = Screen()
+
+    for value in data.values():
+        ball = Ball(tuple(value[0]), value[1], value[2])
+        screen.ball_list.append(ball)
+
+    # Inicializa thread do servidor
+    thread_conn = Thread(target=server_thread)
+    thread_conn.start()
+
+    # Inicializa tela
+    screen.run()
+
 # Thread dedicada para comunicação com o servidor
 
 
@@ -12,20 +34,24 @@ def server_thread():
     global s
 
     while True:
-        data = s.recv(1024)
-        try:
-            data_balls = json.loads(data.decode())
-            updateBalls(data_balls)
-        except:
-            pass
+        msg = s.recv(1024)
+        msg = json.loads(msg.decode())
 
-        if data == "SAIR":
+        if msg['type'] == MessageTypes.UPDATE_BALLS.value:
+            try:
+                data = json.loads(msg['data'])
+                updateBalls(data)
+            except:
+                pass
+
+        elif msg['type'] == MessageTypes.WINNER.value:
+            print(msg['data'])
             s.close()
+            screen.close()
             break
 
+
 # Atualiza posição das bolas na tela
-
-
 def updateBalls(ball_dict):
     global screen
 
@@ -43,19 +69,15 @@ port = 4322  # Reserva uma porta para o serviço.
 s.connect((host, port))
 s.send(str.encode(input("Digite seu nome: ")))
 
-# Recebe lista de bolas do servidor e adiciona à tela
-data = s.recv(1024)
-screen = Screen()
+# Recebe mensagens do servidor até iniciar o jogo
+while True:
+    msg = s.recv(1024)
+    msg = json.loads(msg.decode())
 
-data_balls = json.loads(data.decode())
+    if msg['type'] == MessageTypes.INFORMATION.value:
+        print(msg['data'])
 
-for value in data_balls.values():
-    ball = Ball(tuple(value[0]), value[1], value[2])
-    screen.ball_list.append(ball)
-
-# Inicializa thread do servidor
-thread_conn = Thread(target=server_thread)
-thread_conn.start()
-
-# Inicializa tela
-screen.run()
+    elif msg['type'] == MessageTypes.START.value:
+        data = json.loads(msg['data'])
+        startGame(data)
+        break
