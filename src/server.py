@@ -46,7 +46,7 @@ for i in range(NRO_CLIENTS):
     color = colors[i]   # Pega cor [i] para a bola do cliente.
 
     # Informa jogador sua cor e se faltam clientes para o inicio do jogo
-    data = f"\n{data.decode()} entrou no jogo. Sua cor é: {color[0]}"
+    data = f"\n{data.decode()} entrou no jogo. Sua cor é: {color[2]}{color[0]}"+'\033[0;0m'
 
     if (NRO_CLIENTS - 1 - i > 0):
         data += f"\nFaltam {NRO_CLIENTS - i -1} jogadores para iniciar o jogo. Aguarde."
