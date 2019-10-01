@@ -34,21 +34,22 @@ def server_thread():
     global s
 
     while True:
-        msg = s.recv(1024)
-        msg = json.loads(msg.decode())
+        try:
+            msg = s.recv(1024)
+            msg = json.loads(msg.decode())
 
-        if msg['type'] == MessageTypes.UPDATE_BALLS.value:
-            try:
+            if msg['type'] == MessageTypes.UPDATE_BALLS.value:
                 data = json.loads(msg['data'])
                 updateBalls(data)
-            except:
-                pass
 
-        elif msg['type'] == MessageTypes.WINNER.value:
-            print(msg['data'])
-            s.close()
-            screen.close()
-            break
+            elif msg['type'] == MessageTypes.WINNER.value:
+                print(msg['data'])
+                s.close()
+                screen.close()
+                break
+
+        except:
+            pass
 
 
 # Atualiza posição das bolas na tela
