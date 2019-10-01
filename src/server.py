@@ -98,3 +98,6 @@ while True:
                 msg
             )
         )
+
+    if winner:
+        break

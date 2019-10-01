@@ -27,14 +27,12 @@ class Screen:
         while True:
 
             for event in pygame.event.get():
-                if event.type == QUIT:
-                    exit()
+                if (event.type == QUIT):
+                    return True
 
             self.screen.blit(self.background, (0, 0))
             frame = pygame.draw.rect(
                 self.screen, (255, 255, 255), Rect((5, 5), (630, 470)), 2)
-            # middle_line = pygame.draw.aaline(
-            #     self.screen, (255, 255, 255), (320, 5), (320, 475))
 
             # movement of each ball
             for ball in self.ball_list:
@@ -48,4 +46,5 @@ class Screen:
 
     # Fecha tela
     def close(self):
-        exit()
+        my_event = pygame.event.Event(QUIT, message="Quit Event")
+        pygame.event.post(my_event)

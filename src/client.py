@@ -44,7 +44,6 @@ def server_thread():
 
             elif msg['type'] == MessageTypes.WINNER.value:
                 print(msg['data'])
-                s.close()
                 screen.close()
                 break
 
@@ -72,13 +71,16 @@ s.send(str.encode(input("Digite seu nome: ")))
 
 # Recebe mensagens do servidor até iniciar o jogo
 while True:
-    msg = s.recv(1024)
-    msg = json.loads(msg.decode())
+    try:
+        msg = s.recv(1024)
+        msg = json.loads(msg.decode())
 
-    if msg['type'] == MessageTypes.INFORMATION.value:
-        print(msg['data'])
+        if msg['type'] == MessageTypes.INFORMATION.value:
+            print(msg['data'])
 
-    elif msg['type'] == MessageTypes.START.value:
-        data = json.loads(msg['data'])
-        startGame(data)
-        break
+        elif msg['type'] == MessageTypes.START.value:
+            data = json.loads(msg['data'])
+            startGame(data)
+            break
+    except:
+        pass
